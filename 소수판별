@@ -1,0 +1,40 @@
+문제 설명
+주어진 숫자 중 3개의 수를 더했을 때 소수가 되는 경우의 개수를 구하려고 합니다. 숫자들이 들어있는 배열 nums가 매개변수로 주어질 때, nums에 있는 숫자들 중 서로 다른 3개를 골라 더했을 때 소수가 되는 경우의 개수를 return 하도록 solution 함수를 완성해주세요.
+
+제한사항
+nums에 들어있는 숫자의 개수는 3개 이상 50개 이하입니다.
+nums의 각 원소는 1 이상 1,000 이하의 자연수이며, 중복된 숫자가 들어있지 않습니다.
+
+
+public class Main {
+
+    public static void main(String[] args) {
+        int[] nums = {1,2,4,6,7};
+        System.out.println(solution(nums));
+    }
+
+    static int solution(int[] nums) {
+        int count = 0;
+        // 배열에서 3개의 수를 뽑는법..
+        for(int i = 0; i < nums.length -2 ; i++) { // 배열에서 앞에서부터 수 1개를 뽑음
+            for(int j = i+1 ; j < nums.length -1 ; j++) { // 그 다음 수
+                for(int k = j+1 ; k < nums.length  ; k++) { // 그 다음 수
+                    int sum = nums[i] + nums[j] + nums[k];
+                    if(isPrime(sum)) {
+                      count++;
+                    }
+                }
+            }
+        }
+
+    return count;
+    }
+    static boolean isPrime(int sum) {
+        if(sum < 2) return false; // 2보다 작으면 소수가 아님
+        for(int i = 2; i <= Math.sqrt(sum); i++) {  // 2부터 루트n까지 나누었을때 나누어지면 소수가 아님.
+            if(sum % i == 0) return false;
+        }
+        return true; // 그 외엔 모두 소수임을 판별.
+    }
+
+}
