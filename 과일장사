@@ -1,0 +1,29 @@
+import java.util.Arrays;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        int k = 4;
+        int m = 3;
+        int[] score = {4, 1, 2, 2, 4, 4, 4, 4, 1, 2, 4, 2};
+        int score_len = score.length;
+        System.out.println(solution(k,m,score,score_len));
+
+    }
+
+    static int solution(int k ,int m , int[] score, int score_len) {
+        int answer = 0;
+        Arrays.sort(score); // 배열을 오름차순으로 정리
+        System.out.println(Arrays.toString(score));
+
+        for(int i = score_len - m ; i >= 0 ; i = i-m) {
+            int min = score[i]; // 묶음 중 가장 작은 수
+            answer += min * m ; // 한 상자의 사과개수 * 최저 점수가 점수가 됨
+        }
+
+
+        return answer;
+
+    }
+}
