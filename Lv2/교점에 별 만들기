@@ -1,0 +1,140 @@
+문제 설명
+Ax + By + C = 0으로 표현할 수 있는 n개의 직선이 주어질 때, 이 직선의 교점 중 정수 좌표에 별을 그리려 합니다.
+
+예를 들어, 다음과 같은 직선 5개를
+
+2x - y + 4 = 0
+-2x - y + 4 = 0
+-y + 1 = 0
+5x - 8y - 12 = 0
+5x + 8y + 12 = 0
+좌표 평면 위에 그리면 아래 그림과 같습니다.
+
+이때, 모든 교점의 좌표는 (4, 1), (4, -4), (-4, -4), (-4, 1), (0, 4), (1.5, 1.0), (2.1, -0.19), (0, -1.5), (-2.1, -0.19), (-1.5, 1.0)입니다. 이 중 정수로만 표현되는 좌표는 (4, 1), (4, -4), (-4, -4), (-4, 1), (0, 4)입니다.
+
+만약 정수로 표현되는 교점에 별을 그리면 다음과 같습니다.
+
+위의 그림을 문자열로 나타낼 때, 별이 그려진 부분은 *, 빈 공간(격자선이 교차하는 지점)은 .으로 표현하면 다음과 같습니다.
+
+"..........."  
+".....*....."  
+"..........."  
+"..........."  
+".*.......*."  
+"..........."  
+"..........."  
+"..........."  
+"..........."  
+".*.......*."  
+"..........."  
+이때 격자판은 무한히 넓으니 모든 별을 포함하는 최소한의 크기만 나타내면 됩니다.
+
+따라서 정답은
+
+"....*...."  
+"........."  
+"........."  
+"*.......*"  
+"........."  
+"........."  
+"........."  
+"........."  
+"*.......*"  
+입니다.
+
+직선 A, B, C에 대한 정보가 담긴 배열 line이 매개변수로 주어집니다. 이때 모든 별을 포함하는 최소 사각형을 return 하도록 solution 함수를 완성해주세요.
+
+제한사항
+line의 세로(행) 길이는 2 이상 1,000 이하인 자연수입니다.
+line의 가로(열) 길이는 3입니다.
+line의 각 원소는 [A, B, C] 형태입니다.
+A, B, C는 -100,000 이상 100,000 이하인 정수입니다.
+무수히 많은 교점이 생기는 직선 쌍은 주어지지 않습니다.
+A = 0이면서 B = 0인 경우는 주어지지 않습니다.
+정답은 1,000 * 1,000 크기 이내에서 표현됩니다.
+별이 한 개 이상 그려지는 입력만 주어집니다.
+
+
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        int[][] line = { {0,1,-1}, {1,0,-1}, {1,0,1} };
+        System.out.println(Arrays.toString(solution(line)));
+    }
+
+    public static String[] solution(int[][] line) {
+      // Generic 타입은 Long[]으로 명명 ( 들어가는 값 타입은 Long 배열로 하겠다. 이 배열들을 List에 넣겠다 )
+        List<Long[]> points = new ArrayList<>();
+
+        // 교점 구하기
+        for(int i = 0; i < line.length; i++) {
+            for(int j = i+1; j < line.length; j++) {
+
+                long A = line[i][0];  long B = line[i][1];  long E = line[i][2];
+                long C = line[j][0];  long D = line[j][1];  long F = line[j][2];
+
+                long denominator =  (A*D)-(B*C); // 분모가 0 인 경우 두 직선은 평행 or 일치
+
+                if(denominator == 0) continue;
+                
+                // 교점 중 정수값만 List에 넣음
+                if(((B*F)-(E*D)) % denominator == 0 && ((E*C)-(A*F)) % denominator == 0) { 
+                    long x = (((B * F) - (E * D)) / ((A * D) - (B * C)));
+                    long y = (((E * C) - (A * F)) / ((A * D) - (B * C)));
+                    points.add(new Long[]{x, y});
+                }
+
+            }
+        }
+        // 디버그용
+       for(Long[] array : points) {
+           System.out.println(Arrays.toString(array));
+       }
+        // 최대치와 최소치에 각각 최소치,최대치로 초기화. ( 최소와 최대값을 알아내기 위해 )
+       Long minX = Long.MAX_VALUE;
+       Long maxX = Long.MIN_VALUE;
+       Long minY = Long.MAX_VALUE;
+       Long maxY = Long.MIN_VALUE;
+
+        // 저장된 좌표 값을 돌아가면서 확인함. 
+       for( Long[] point : points ) {
+           minX = Math.min(point[0], minX);
+           maxX = Math.max(point[0], maxX);
+           minY = Math.min(point[1], minY);
+           maxY = Math.max(point[1], maxY);
+       }
+        // 그릴 배열 좌표계의 크기 설정
+       int length = (int) (maxY - minY + 1);
+       int width = (int) (maxX- minX + 1);
+      // 배열 [][] 에서 앞부분이 y 좌표임을 주의
+       char[][] grid = new char[length][width];
+
+        // 그릴 배열 좌표계를 전부 . 로 초기화
+       for(int i = 0; i < grid.length; i++) {
+           for(int j = 0; j < grid[i].length; j++) {
+               grid[i][j] = '.';
+           }
+       }
+
+       
+       // 수학 좌표계에서 배열 좌표계로 변환시 x 좌표값은 x값에서 가장 작은 x값을 빼면 상대적인 x 좌표위치가 나오게됨.
+        // y좌표는 수학 좌표계는 y값이 커지면 위로 증가, 하지만 배열 좌표계는 y값이 커지면 아래로 증가함. 따라서 최대치에서 y값을 빼야함
+        // = maxY - y , x - minX
+       for( Long[] point : points) {
+           int x = (int) (point[0] - minX);
+           int y = (int) (maxY - point[1]);
+           grid[y][x] = '*';
+       }
+        
+       // 정답 배열을 그린 배열 좌표계의 크기 만큼 초기화. 이후 grid에서 한 row [이부분][] 에 있는 값을 모두 통합하여 저장.
+       String[] answer = new String[length];
+       for(int i = 0 ; i < length; i++) {
+           answer[i] = new String(grid[i]);
+       }
+
+
+        return answer;
+    }
+}
