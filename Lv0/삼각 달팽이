@@ -1,0 +1,64 @@
+정수 n이 매개변수로 주어집니다. 다음 그림과 같이 밑변의 길이와 높이가 n인 삼각형에서 맨 위 꼭짓점부터
+반시계 방향으로 달팽이 채우기를 진행한 후,
+첫 행부터 마지막 행까지 모두 순서대로 합친 새로운 배열을 return 하도록 solution 함수를 완성해주세요.
+
+
+import java.util.Arrays;
+public class Main {
+    public static void main(String[] args) {
+        int n = 5;
+        System.out.println(Arrays.toString(solution(n)));
+    }
+
+    public static int[] solution(int n) {
+        int total = ( n*(n+1) / 2 );
+        int[] answer = new int[total];
+        int[][] array = new int[n][]; //n 만큼 배열 초기화
+        // 0 = 아래, 1 = 오른쪽, 2 = 위
+        int direction = 0;
+        int x = 0 ; int y = 0;
+       // 각 행마다 n+1만큼 배열 초기화
+        for (int i = 0; i < n; i++) {
+            array[i] = new int[i+1];
+        }
+
+        for (int i = 0; i < total;i++) {
+
+            switch (direction) {
+                // 값 저장후, 다음 좌표 설정
+                case 0:
+                    array[y][x] = i + 1;
+                    // 마지막 행인 경우 바로 방향 전환
+                    if(y>=n-1) { direction = 1; x++; break; }
+
+                    // 다음 좌표가 이미 쓰여져 있는 경우, 방향 전환.
+                    if(array[y+1][x] != 0) { direction =1; x++; break;}
+                    else{ y++; }
+                    break;
+                case 1:
+                    array[y][x] = i + 1;
+                    // 마지막 열인 경우 바로 방향 전환
+                    if(x >= array[y].length - 1) { direction = 2; x--; y--; break;}
+                    // 다음 좌표에 이미 쓰여져 있다면 바로 방향 전환.
+                    if(array[y][x+1] != 0) { direction = 2 ; x--; y--; break;}
+                    else{ x++; }
+                    break;
+                case 2:
+                    array[y][x] = i + 1;
+                    if(y <= 1 )  { direction = 0; y++; break;}
+                    if(array[y-1][x-1] != 0) { direction = 0 ; y++; break;}
+                    else{ y--;x--; }
+                    break;
+
+            }
+        }
+        int index = 0;
+        for(int i = 0; i < array.length; i++) {
+            for(int j = 0 ; j < array[i].length; j++) {
+                answer[index] = array[i][j];
+                index++;
+            }
+        }
+        return answer;
+    }
+}
